@@ -12,8 +12,8 @@ export default async function Home() {
     .order("reservation_date", { ascending: true })
 
   return (
-    <div className="min-h-screen bg-background p-2 sm:p-4 md:p-8 grid place-content-center">
-      <div className=" mx-auto space-y-4 sm:space-y-6">
+    <div className="min-h-screen bg-background p-2 sm:p-4 md:p-8">
+      <div>
         <ReservationManager reservations={reservations || []} />
       </div>
     </div>

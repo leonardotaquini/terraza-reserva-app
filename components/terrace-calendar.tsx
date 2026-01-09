@@ -207,7 +207,7 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
 
   return (
     <>
-      <Card>
+      <Card className="sm:grid sm:place-content-center">
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <CardTitle className="text-xl sm:text-2xl">
