@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { formatLongDate } from "@/lib/formatDate"
 
 type ReservationDialogProps = {
   open: boolean
@@ -87,12 +88,9 @@ export function ReservationDialog({ open, onOpenChange, date, timeSlot }: Reserv
             {date && !reservationCode && (
               <>
                 <span className="font-medium">Fecha: </span>
-                {date.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {
+                  formatLongDate(date)
+                }
                 <br />
                 <span className="font-medium">Horario: </span>
                 {timeSlotText}

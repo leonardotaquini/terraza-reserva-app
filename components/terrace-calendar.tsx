@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatLongDate } from "@/lib/formatDate"
 
 type Reservation = {
   id: string
@@ -271,12 +272,7 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
               <div className="space-y-2 text-sm">
                 <p>
                   <span className="font-semibold">Fecha:</span>{" "}
-                  {new Date(cancelDialog.reservation.reservation_date).toLocaleDateString("es-ES", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {formatLongDate(cancelDialog.reservation.reservation_date)}
                 </p>
                 <p>
                   <span className="font-semibold">Horario:</span>{" "}
