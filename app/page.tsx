@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { ReservationManager } from "@/components/reservation-manager"
 import { AuroraText } from "@/components/ui/aurora-text"
+import { Footer } from "@/components/footer"
 
 export const dynamic = "force-dynamic"
 
@@ -20,6 +21,7 @@ export default async function Home() {
         </div>
         <ReservationManager reservations={reservations || []} />
       </div>
+      <Footer />
     </div>
   )
 }
