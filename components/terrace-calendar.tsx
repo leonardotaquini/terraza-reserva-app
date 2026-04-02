@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatLongDate } from "@/lib/formatDate"
+import { Footer } from "./footer"
 
 type Reservation = {
   id: string
@@ -258,6 +259,7 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
             </div>
             <div className="sm:hidden text-muted-foreground">M = Mañana, T = Tarde/Noche</div>
           </div>
+          <Footer />
         </CardContent>
       </Card>
 
