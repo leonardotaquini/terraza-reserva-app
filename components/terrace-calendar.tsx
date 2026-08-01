@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { formatLongDate } from "@/lib/formatDate"
 import { Footer } from "./footer"
@@ -103,21 +104,35 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
     return date < today
   }
 
+  // Una reserva es pasada si su fecha (yyyy-MM-dd) ya quedó atrás respecto de hoy.
+  const isPastReservation = (reservation: Reservation) => {
+    const [year, month, day] = reservation.reservation_date.split("-").map(Number)
+    const date = new Date(year, month - 1, day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return date < today
+  }
+
   const canCancelReservation = (reservation: Reservation) => {
-    return userCodes[reservation.id] === reservation.reservation_code
+    // Solo se puede cancelar si el código coincide Y la fecha no pasó.
+    return userCodes[reservation.id] === reservation.reservation_code && !isPastReservation(reservation)
   }
 
   const handleSlotClick = (day: number, timeSlot: "morning" | "afternoon_evening") => {
     const reservation = getReservation(day, timeSlot)
 
     if (reservation) {
+      // Las reservas de fechas pasadas ya no se pueden cancelar.
+      if (isPastReservation(reservation)) {
+        return
+      }
       if (canCancelReservation(reservation)) {
         setCancelDialog({
           open: true,
           reservation,
         })
       } else {
-        alert("Esta reserva pertenece a otro departamento. Solo quien reservó puede cancelarla.")
+        toast.info("Esta reserva pertenece a otro departamento. Solo quien reservó puede cancelarla.")
       }
     } else if (!isPastDate(day)) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
@@ -153,12 +168,21 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
           <button
             onClick={() => handleSlotClick(day, "morning")}
             disabled={past}
+            aria-label={
+              morningReserved
+                ? `Mañana del ${day}: reservado por ${morningReservation?.floor}${morningReservation?.apartment}${past ? " (finalizada)" : canCancelMorning ? " (tu reserva, click para cancelar)" : ""}`
+                : past
+                  ? `Mañana del ${day}: no disponible (fecha pasada)`
+                  : `Reservar mañana del ${day}`
+            }
             className={cn(
               "text-[10px] sm:text-xs p-0.5 sm:p-1.5 rounded transition-colors text-left leading-tight",
               morningReserved
-                ? canCancelMorning
-                  ? "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200 cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900 font-semibold"
-                  : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 cursor-not-allowed"
+                ? past
+                  ? "bg-muted text-muted-foreground cursor-not-allowed line-through"
+                  : canCancelMorning
+                    ? "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200 cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900 font-semibold"
+                    : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 cursor-not-allowed"
                 : past
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-900 cursor-pointer",
@@ -179,12 +203,21 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
           <button
             onClick={() => handleSlotClick(day, "afternoon_evening")}
             disabled={past}
+            aria-label={
+              afternoonReserved
+                ? `Tarde/Noche del ${day}: reservado por ${afternoonReservation?.floor}${afternoonReservation?.apartment}${past ? " (finalizada)" : canCancelAfternoon ? " (tu reserva, click para cancelar)" : ""}`
+                : past
+                  ? `Tarde/Noche del ${day}: no disponible (fecha pasada)`
+                  : `Reservar tarde/noche del ${day}`
+            }
             className={cn(
               "text-[10px] sm:text-xs p-0.5 sm:p-1.5 rounded transition-colors text-left leading-tight",
               afternoonReserved
-                ? canCancelAfternoon
-                  ? "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200 cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900 font-semibold"
-                  : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 cursor-not-allowed"
+                ? past
+                  ? "bg-muted text-muted-foreground cursor-not-allowed line-through"
+                  : canCancelAfternoon
+                    ? "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200 cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900 font-semibold"
+                    : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 cursor-not-allowed"
                 : past
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-900 cursor-pointer",
@@ -220,6 +253,7 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
                 variant="outline"
                 size="icon"
                 onClick={previousMonth}
+                aria-label="Mes anterior"
                 className="h-8 w-8 sm:h-10 sm:w-10 bg-transparent"
               >
                 <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -228,6 +262,7 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
                 variant="outline"
                 size="icon"
                 onClick={nextMonth}
+                aria-label="Mes siguiente"
                 className="h-8 w-8 sm:h-10 sm:w-10 bg-transparent"
               >
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -256,6 +291,10 @@ export function TerraceCalendar({ reservations, onDateSelect, onCancelReservatio
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-100 dark:bg-red-950 rounded border border-red-300 dark:border-red-800" />
               <span>Reservado por otro</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 bg-muted rounded border border-border" />
+              <span>Finalizada</span>
             </div>
             <div className="sm:hidden text-muted-foreground">M = Mañana, T = Tarde/Noche</div>
           </div>

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { formatLongDate } from "@/lib/formatDate"
+import { Sparkles } from "lucide-react"
 
 type ReservationDialogProps = {
   open: boolean
@@ -52,7 +53,14 @@ export function ReservationDialog({ open, onOpenChange, date, timeSlot }: Reserv
         .select()
         .single()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        // 23505 = violación de restricción UNIQUE (fecha + horario ya reservados)
+        if (insertError.code === "23505") {
+          setError("Ese horario ya fue reservado, elegí otro.")
+          return
+        }
+        throw insertError
+      }
 
       if (data) {
         const reservationKey = `reservation_${data.id}`
@@ -101,10 +109,16 @@ export function ReservationDialog({ open, onOpenChange, date, timeSlot }: Reserv
         {reservationCode ? (
           <div className="space-y-4">
             <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <p className="text-sm sm:text-base mb-3 text-green-900 dark:text-green-100">
+              <p className="text-sm sm:text-base text-green-900 dark:text-green-100">
                 Tu reserva ha sido creada exitosamente. Solamente podrás cancelar la reserva desde este dispositivo.
               </p>
-
+            </div>
+            <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <Sparkles className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+              <p className="text-sm sm:text-base text-amber-900 dark:text-amber-100">
+                Recordá <span className="font-semibold">limpiar y dejar la terraza en buenas condiciones</span> para el
+                próximo vecino. ¡Gracias!
+              </p>
             </div>
             <Button onClick={handleClose} className="w-full">
               Entendido

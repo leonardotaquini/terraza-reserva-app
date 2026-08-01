@@ -5,6 +5,7 @@ import { TerraceCalendar } from "@/components/terrace-calendar"
 import { ReservationDialog } from "@/components/reservation-dialog"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 type Reservation = {
   id: string
@@ -43,8 +44,9 @@ export function ReservationManager({ reservations }: ReservationManagerProps) {
 
       // Refresh to show updated calendar
       router.refresh()
+      toast.success("Reserva cancelada correctamente.")
     } catch (err) {
-      alert("Error al cancelar la reserva. Por favor intenta nuevamente.")
+      toast.error("Error al cancelar la reserva. Por favor intenta nuevamente.")
       console.error(err)
     }
   }

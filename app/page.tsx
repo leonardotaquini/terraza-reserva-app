@@ -14,8 +14,8 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background p-2 sm:p-4 md:p-8">
-      <div className="flex gap-8 justify-center h-[90vh] flex-col">
-        <div className="text-center text-3xl font-bold tracking-tighter md:text-3xl lg:text-5xl">
+      <div className="mx-auto flex min-h-[85vh] max-w-4xl flex-col justify-center gap-6 sm:gap-10">
+        <div className="text-center text-3xl font-bold tracking-tighter md:text-4xl lg:text-5xl">
           <AuroraText colors={["#92939C", "#154A8F", "#92939C", "#154A8F"]}>Reserva de la terraza</AuroraText>
         </div>
         <ReservationManager reservations={reservations || []} />
